@@ -1,0 +1,21 @@
+name: gesvla_data
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+      - numpy
+      - opencv-python
+      - open3d
+      - tqdm
+      - mediapipe==0.10.5
+      - pyarrow
+      - Pillow
+      - trimesh
+      - torch
+      - torchvision
+      - torchaudio
+      - pygltflib
+      - pyyaml
