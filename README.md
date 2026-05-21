@@ -20,7 +20,7 @@ data/
 ...
 ```
 
-All datasets can be obtained from [https://cloud.tsinghua.edu.cn/d/41fa523bc7ae4565ac03/]. We provide synthetic data for the block scene, which can be used to train and validate the Intent Reasoning model of GesVLA. Additional synthetic data can be generated using the data generation pipeline in `data_generation/`. We also provide robot arm action data for the block, jelly, and fruit/vegetable scenes. The amount of provided data exceeds the training requirement, so you can select as needed.
+All datasets can be obtained from [here](https://cloud.tsinghua.edu.cn/d/41fa523bc7ae4565ac03/). We provide synthetic data for the block scene, which can be used to train and validate the Intent Reasoning model of GesVLA. Additional synthetic data can be generated using the data generation pipeline in `data_generation/`. We also provide robot arm action data for the block, jelly, and fruit/vegetable scenes. The amount of provided data exceeds the training requirement, so you can select as needed.
 
 ### Training Pipeline
 
