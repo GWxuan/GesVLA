@@ -394,7 +394,10 @@ class UMITrainConfig(TrainConfig):
             # NNX paths are typically like ".../hand_pose_mlp_1/kernel".
             freeze_hand_pose = nnx_utils.PathRegex(r".*hand_pose_mlp_[12](/.*)?$")
 
-            freeze = nnx.All(nnx.Param, nnx.Any(freeze_vlm0, freeze_hand_pose))
+            # Freeze embedder to avoid degrading pre-trained token embeddings during training.
+            freeze_embedder = nnx_utils.PathRegex(r".*embedder(/.*)?$")
+
+            freeze = nnx.All(nnx.Param, nnx.Any(freeze_vlm0, freeze_hand_pose, freeze_embedder))
             object.__setattr__(self, "freeze_filter", freeze)
 
             
