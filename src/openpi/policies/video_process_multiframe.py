@@ -16,15 +16,6 @@ DIFF_THRESH = 20
 MOTION_RATIO_THRESH = 0.01
 MIN_STATIC_LEN = 6
 
-# Instruction templates
-content_grab_and_move = [
-    "Instruction: pick this up and put it there.",
-    "Instruction: take this one and place it on that.",
-    "Instruction: pick it up and put it over there.",
-    "Instruction: carry this and release it there.",
-    "Instruction: stack this block over there.",
-    "Instruction: move this onto that one.",
-]
 
 def apply_mask_to_frame(frame):
     """
@@ -104,11 +95,11 @@ def process_video_frames(frames, frame_num=2):
     Note: returns (None, None, None) on failure.
     """
     if not frames or len(frames) == 0:
-        print("错误: 输入帧列表为空")
+        print("Error: input frame list is empty")
         return None, None, None
     
     if frame_num not in [1, 2, 3]:
-        print(f"错误: 不支持的停顿帧数量 {frame_num}，仅支持 1, 2, 3")
+        print(f"Error: unsupported pause frame count {frame_num}, only 1, 2, 3 are supported")
         return None, None, None
     
     n_frames = len(frames)
@@ -118,7 +109,7 @@ def process_video_frames(frames, frame_num=2):
     
     # If hand detection fails, try image-change detection.
     if hand_start is None or hand_end is None:
-        print("警告: 未检测到手部，尝试使用图像变化检测")
+        print("Warning: hand not detected, falling back to image-change detection")
         hand_start = detect_activity_start_from_image_changes(frames)
         hand_end = n_frames - 1
     else:
@@ -126,10 +117,10 @@ def process_video_frames(frames, frame_num=2):
         hand_start1 = detect_activity_start_from_image_changes(frames)
         hand_start = min(hand_start, hand_start1)
     
-    print(f"手部检测区间: 第 {hand_start} 帧到第 {hand_end} 帧")
+    print(f"Hand detection interval: frame {hand_start} to frame {hand_end}")
     
     if hand_start is None or hand_end is None:
-        print("错误: 无法确定手部区间")
+        print("Error: unable to determine hand interval")
         return None, None, None
     
     # Step 2: interpolate keypoints.
@@ -139,7 +130,7 @@ def process_video_frames(frames, frame_num=2):
     pause_frame_indices = extract_pause_frames_in_interval(all_frames, hand_start, hand_end, frame_num)
     
     if len(pause_frame_indices) < frame_num:
-        print(f"警告: 未检测到足够的停顿帧（当前 {len(pause_frame_indices)}，需要 {frame_num}），使用补充策略")
+        print(f"Warning: insufficient pause frames detected ({len(pause_frame_indices)} found, {frame_num} needed), using fallback strategy")
         # Fill in missing frames.
         while len(pause_frame_indices) < frame_num:
             if len(pause_frame_indices) == 0:
@@ -153,19 +144,15 @@ def process_video_frames(frames, frame_num=2):
                     pause_frame_indices.append(hand_end)
                     break
     
-    print(f"选定的停顿帧索引: {pause_frame_indices}")
+    print(f"Selected pause frame indices: {pause_frame_indices}")
     
-    # Step 4: randomly select a thought instruction.
-    thought = np.random.choice(content_grab_and_move)
-    print(f"选择的指令: {thought}")
-    
-    # Step 5: extract pause frames and keypoint vectors.
+    # Step 4: extract pause frames and keypoint vectors.
     pause_frames = []
     keypoint_vectors = []
     
     for frame_idx in pause_frame_indices[:frame_num]:  # Ensure only the requested count.
         if frame_idx >= len(frames):
-            print(f"警告: 帧索引 {frame_idx} 超出范围，使用最后一帧")
+            print(f"Warning: frame index {frame_idx} out of range, using last frame")
             frame_idx = len(frames) - 1
         
         # Get pause frame (raw image).
@@ -176,7 +163,7 @@ def process_video_frames(frames, frame_num=2):
             kp_vector = keypoints_interp[frame_idx].copy()
         else:
             kp_vector = np.zeros(12, dtype=float)
-            print(f"警告: 帧索引 {frame_idx} 超出关键点数组范围，使用零向量")
+            print(f"Warning: frame index {frame_idx} out of keypoints array range, using zero vector")
         
         keypoint_vectors.append(kp_vector)
 
@@ -200,7 +187,7 @@ def process_video_frames(frames, frame_num=2):
         pause_frames.append(frames[-1].copy())
         keypoint_vectors.append(np.zeros(12, dtype=float))
     
-    return pause_frames, keypoint_vectors, thought
+    return pause_frames, keypoint_vectors
 
 def process_video_frames_with_mediapipe(frames):
     """
@@ -228,9 +215,9 @@ def process_video_frames_with_mediapipe(frames):
     valid_mask = np.zeros(n_frames, dtype=bool)
     hand_detected_frames = []
     
-    print(f"正在处理 {n_frames} 帧")
+    print(f"Processing {n_frames} frames")
     
-    for i in tqdm(range(n_frames), desc="帧处理"):
+    for i in tqdm(range(n_frames), desc="Frame processing"):
         frame = frames[i]
 
         # Keep consistent with pauseframes.py: use mask by default.
@@ -266,7 +253,7 @@ def process_video_frames_with_mediapipe(frames):
     
     # Determine the hand interval.
     if not hand_detected_frames:
-        print("警告: 未检测到手部")
+        print("Warning: hand not detected")
         return all_frames, all_keypoints, valid_mask, None, None
     
     hand_start = max(0, hand_detected_frames[0])  
@@ -274,7 +261,7 @@ def process_video_frames_with_mediapipe(frames):
     
     # Ensure the interval has enough frames.
     if hand_end - hand_start < MIN_STATIC_LEN * 2:
-        print(f"警告: 手部区间太短 ({hand_end - hand_start} 帧)")
+        print(f"Warning: hand interval too short ({hand_end - hand_start} frames)")
         return all_frames, all_keypoints, valid_mask, hand_start, hand_end
     
     return all_frames, all_keypoints, valid_mask, hand_start, hand_end
@@ -301,7 +288,7 @@ def interpolate_keypoints(all_keypoints, valid_mask):
                 col[valid_idx]
             )
     else:
-        print("警告: 有效关键点帧数不足，跳过插值")
+        print("Warning: insufficient valid keypoint frames, skipping interpolation")
         keypoints_interp = all_keypoints.copy()
     
     return keypoints_interp
@@ -324,7 +311,7 @@ def extract_pause_frames_in_interval(all_frames, hand_start, hand_end, num_pause
     interval_frames = all_frames[hand_start:hand_end+1]
     
     if len(interval_frames) < MIN_STATIC_LEN * 2:
-        print(f"警告: 手部区间帧数不足 ({len(interval_frames)} 帧)")
+        print(f"Warning: insufficient frames in hand interval ({len(interval_frames)} frames)")
         return []
     
     # Detect all static segments.
@@ -365,7 +352,7 @@ def extract_pause_frames_in_interval(all_frames, hand_start, hand_end, num_pause
                 hand_end
             ))
     
-    print(f"检测到 {len(static_segments)} 个静止段: {static_segments}")
+    print(f"Detected {len(static_segments)} static segments: {static_segments}")
     
     # Select frames based on the requested count.
     pause_frames = _select_pause_frames(static_segments, hand_start, hand_end, num_pause_frames)
@@ -450,7 +437,7 @@ def _select_pause_frames(static_segments, hand_start, hand_end, num_pause_frames
             ]
     
     else:
-        raise ValueError(f"不支持的停顿帧数量: {num_pause_frames}，仅支持 1, 2, 3")
+        raise ValueError(f"Unsupported pause frame count: {num_pause_frames}, only 1, 2, 3 are supported")
 
 # Example usage function
 def example_usage(video_path, frame_num=2):
@@ -473,31 +460,31 @@ def example_usage(video_path, frame_num=2):
     
     cap.release()
     
-    print(f"读取了 {len(frames)} 帧")
+    print(f"Read {len(frames)} frames")
     
     # Call the processing function.
     pause_frames, keypoint_vectors, thought = process_video_frames(frames, frame_num)
     
     if pause_frames is not None:
-        print(f"返回了 {len(pause_frames)} 个停顿帧")
-        print(f"每个关键点向量维度: {keypoint_vectors[0].shape}")
+        print(f"Returned {len(pause_frames)} pause frames")
+        print(f"Each keypoint vector dimension: {keypoint_vectors[0].shape}")
         print(f"Thought: {thought}")
         
         # Further processing can be done here.
         return pause_frames, keypoint_vectors, thought
     else:
-        print("处理失败")
+        print("Processing failed")
         return None, None, None
 
 # Main entry when run directly
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='从视频中提取多个停顿帧')
+    parser = argparse.ArgumentParser(description='Extract multiple pause frames from video')
     parser.add_argument('--video_path', type=str, required=True,
-                        help='视频文件路径')
+                        help='video file path')
     parser.add_argument('--frame_num', type=int, default=2, choices=[1, 2, 3],
-                        help='需要提取的停顿帧数量 (1, 2, 或 3)')
+                        help='number of pause frames to extract (1, 2, or 3)')
     
     args = parser.parse_args()
     
