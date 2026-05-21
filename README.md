@@ -1,8 +1,39 @@
 # GesVLA: Gesture-Aware Vision-Language-Action Model with Embedded Representations
 
-## Installation
+[[Project Page]](https://GWxuan.github.io/GesVLA/) [[Code]](https://github.com/GWxuan/GesVLA) [[Datasets]](https://cloud.tsinghua.edu.cn/d/41fa523bc7ae4565ac03/)
 
-## Training GesVLA
+[Wenxuan Guo](https://GWxuan.github.io/)<sup>1\*</sup>,
+Ziyuan Li<sup>1\*</sup>,
+Meng Zhang<sup>2†</sup>,
+Yichen Liu<sup>1</sup>,
+Yimeng Dong<sup>1</sup>,
+Chuxi Xu<sup>1</sup>,
+Yunfei Wei<sup>2</sup>,
+Ze Chen<sup>2</sup>,
+Erjin Zhou<sup>2</sup>,
+[Jianjiang Feng](https://ivg.au.tsinghua.edu.cn/~jfeng/index.html)<sup>1‡</sup>
+
+<sup>1</sup>Tsinghua University,
+<sup>2</sup>Dexmal
+
+<sup>\*</sup> Equal contributions. <sup>†</sup> Project leader. <sup>‡</sup> Corresponding author.
+
+## 🛠️ Installation
+
+We manage Python dependencies with [uv](https://docs.astral.sh/uv/). If you haven't installed `uv`, please follow [uv installation instructions](https://docs.astral.sh/uv/getting-started/installation/) to set it up.
+
+Run the following to set up the environment:
+
+```bash
+GIT_LFS_SKIP_SMUDGE=1 uv sync
+GIT_LFS_SKIP_SMUDGE=1 uv pip install -e .
+```
+
+> NOTE: `GIT_LFS_SKIP_SMUDGE=1` is needed to pull LeRobot as a dependency.
+
+For more details, refer to the original [openpi repository](https://github.com/Physical-Intelligence/openpi.git).
+
+## 🚀 Training GesVLA
 
 ### Data Preparation
 
@@ -38,7 +69,7 @@ bash train_scripts/train_gesvla_2vlm.sh
 
 Configuration for both training stages can be adjusted in the training scripts.
 
-## Deployment
+## 🦾 Deployment
 
 We adopt a policy server + hardware client architecture for deployment. We provide the server-side deployment code. The client-side code should provide observation data to the server and receive action data for execution. You can implement the client based on your own robot hardware configuration.
 
@@ -48,6 +79,34 @@ Configure the model checkpoint path and run:
 bash scripts/serve_2vlm.sh
 ```
 
-## Acknowledgements
+## 🎬 Demo
+
+Real-world rollouts with a 7-DoF manipulator and three-camera observations (global, side, gripper). Each clip follows combined gesture-and-language instructions. For clearer videos, see the [project page](https://GWxuan.github.io/GesVLA/).
+
+### Pick-and-Place Block
+
+Grasp a specified block from clutter and place it on the designated plate.
+
+<p align="center">
+  <img src="assets/demo_block.gif" width="85%" alt="Pick-and-Place Block demo">
+</p>
+
+### Select Jelly
+
+Pick specified jelly cups in pointing order and place them into a target plate.
+
+<p align="center">
+  <img src="assets/demo_jelly.gif" width="85%" alt="Select Jelly demo">
+</p>
+
+### Select Fruit and Vegetable
+
+Pick specified bell peppers and bananas in pointing order and place them into a basket.
+
+<p align="center">
+  <img src="assets/demo_produce.gif" width="85%" alt="Select Fruit and Vegetable demo">
+</p>
+
+## 🙏 Acknowledgements
 
 We express our sincere gratitude to the developers of [openpi](https://github.com/Physical-Intelligence/openpi.git) and [OneTwoVLA](https://github.com/Fanqi-Lin/OneTwoVLA.git) for open-sourcing their code, which has provided strong support for our project.
