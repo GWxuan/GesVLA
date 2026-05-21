@@ -22,84 +22,6 @@ import openpi.transforms as transforms
 logger = logging.getLogger("openpi.policy_config_2vlm_withref")
 
 
-def _restore_embedder_from_vlm0(model, vlm0_params_path: str) -> None:
-    """Restore Embedder weights from a VLM0 pre-training checkpoint.
-
-    """
-    vlm0_params_path = pathlib.Path(vlm0_params_path)
-    if not vlm0_params_path.exists():
-        logger.warning(
-            "VLM0 pre-training checkpoint not found: %s — skipping Embedder restore",
-            vlm0_params_path,
-        )
-        return
-
-    print(f"Restoring Embedder from VLM0 pre-training checkpoint: {vlm0_params_path}")
-
-    vlm0_params = _model.restore_params(vlm0_params_path, dtype=jnp.bfloat16)
-    flat_vlm0 = traverse_util.flatten_dict(vlm0_params)
-
-    # Locate the Embedder weight by key substring matching
-    vlm0_embedder_key = None
-    for k in flat_vlm0:
-        k_str = "/".join(str(s) for s in k)
-        if "embedder" in k_str and "input_embedding" in k_str:
-            vlm0_embedder_key = k
-            break
-
-    if vlm0_embedder_key is None:
-        all_keys = ["/".join(str(s) for s in k) for k in flat_vlm0]
-        logger.error(
-            "Embedder weight not found in VLM0 checkpoint. "
-            "Total keys: %d. First 20: %s",
-            len(all_keys),
-            all_keys[:20],
-        )
-        return
-
-    vlm0_embedder_weight = flat_vlm0[vlm0_embedder_key]
-    print(
-        f"  VLM0 Embedder key : {'/'.join(str(s) for s in vlm0_embedder_key)}\n"
-        f"  VLM0 Embedder shape: {vlm0_embedder_weight.shape}, "
-        f"dtype: {vlm0_embedder_weight.dtype}"
-    )
-
-    # Extract and flatten the current model state
-    graphdef, state = nnx.split(model)
-    state_dict = state.to_pure_dict()
-    flat = traverse_util.flatten_dict(state_dict)
-
-    embedder_key = None
-    for k in flat:
-        k_str = "/".join(str(s) for s in k)
-        if "embedder" in k_str and "input_embedding" in k_str:
-            embedder_key = k
-            break
-
-    if embedder_key is None:
-        logger.error("Embedder key not found in current model parameters")
-        return
-
-    old_weight = flat[embedder_key]
-    print(f"  Current Embedder shape: {old_weight.shape}, dtype: {old_weight.dtype}")
-
-    if old_weight.shape != vlm0_embedder_weight.shape:
-        logger.error(
-            "Embedder shape mismatch: current %s vs VLM0 %s",
-            old_weight.shape,
-            vlm0_embedder_weight.shape,
-        )
-        return
-
-    # Replace and merge back into the model (NNX modules are mutable)
-    flat[embedder_key] = vlm0_embedder_weight.astype(old_weight.dtype)
-    state_dict = traverse_util.unflatten_dict(flat)
-    state.replace_by_pure_dict(state_dict)
-    merged = nnx.merge(graphdef, state)
-    model.__dict__.update(merged.__dict__)
-
-    print("  Embedder weights successfully restored from VLM0 pre-training checkpoint")
-
 
 def create_policy_2vlm_withref(
     config: _config.TrainConfig,
@@ -124,11 +46,6 @@ def create_policy_2vlm_withref(
         _model.restore_params(checkpoint_dir / "params", dtype=jnp.bfloat16)
     )
 
-    # Optionally restore VLM0 Embedder weights from a pre-training checkpoint
-    if vlm0_pretrain_params is not None:
-        _restore_embedder_from_vlm0(model, vlm0_pretrain_params)
-    else:
-        logger.info("vlm0_pretrain_params not provided — skipping Embedder restore")
 
     # Build the data configuration and normalisation statistics
     data_config = config.data.create(config.assets_dirs, config.model)
