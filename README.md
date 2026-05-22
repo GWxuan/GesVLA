@@ -1,8 +1,14 @@
 # GesVLA: Gesture-Aware Vision-Language-Action Model with Embedded Representations
 
-[[Project Page]](https://GWxuan.github.io/GesVLA/) [[Code]](https://github.com/GWxuan/GesVLA) [[Datasets]](https://cloud.tsinghua.edu.cn/d/41fa523bc7ae4565ac03/)
+<p align="center" style="margin:1.4em 0 0.8em;">
+  <a href="https://GWxuan.github.io/GesVLA/"><img src="https://img.shields.io/badge/Project_Page-GesVLA-2EA44F?style=flat&labelColor=555555" alt="Project Page"></a>
+  &nbsp;
+  <a href="https://arxiv.org/abs/2605.22812"><img src="https://img.shields.io/badge/arXiv-2605.22812-B31B1B?style=flat&labelColor=555555&logo=arxiv&logoColor=white" alt="Paper"></a>
+  &nbsp;
+  <a href="https://cloud.tsinghua.edu.cn/d/41fa523bc7ae4565ac03/"><img src="https://img.shields.io/badge/Dataset-GesVLA-FFD63A?style=flat&labelColor=555555" alt="Dataset"></a>
+</p>
 
-[Wenxuan Guo](https://GWxuan.github.io/)<sup>1\*</sup>,
+<!-- [Wenxuan Guo](https://GWxuan.github.io/)<sup>1\*</sup>,
 Ziyuan Li<sup>1\*</sup>,
 Meng Zhang<sup>2†</sup>,
 Yichen Liu<sup>1</sup>,
@@ -16,7 +22,7 @@ Erjin Zhou<sup>2</sup>,
 <sup>1</sup>Tsinghua University,
 <sup>2</sup>Dexmal
 
-<sup>\*</sup> Equal contributions. <sup>†</sup> Project leader. <sup>‡</sup> Corresponding author.
+<sup>\*</sup> Equal contributions. <sup>†</sup> Project leader. <sup>‡</sup> Corresponding author. -->
 
 ## 🛠️ Installation
 
@@ -110,3 +116,17 @@ Pick specified bell peppers and bananas in pointing order and place them into a 
 ## 🙏 Acknowledgements
 
 We express our sincere gratitude to the developers of [openpi](https://github.com/Physical-Intelligence/openpi.git) and [OneTwoVLA](https://github.com/Fanqi-Lin/OneTwoVLA.git) for open-sourcing their code, which has provided strong support for our project.
+
+
+
+## 📜 Citation
+
+```bibtex
+@article{guo2026gesvla,
+      title={GesVLA: Gesture-Aware Vision-Language-Action Model Embedded Representations}, 
+      author={Wenxuan Guo and Ziyuan Li and Meng Zhang and Yichen Liu and Yimeng Dong and Chuxi Xu and Yunfei Wei and Ze Chen and Erjin Zhou and Jianjiang Feng},
+      journal={arXiv preprint arXiv:2605.22812},
+      year={2026},
+      url={https://arxiv.org/abs/2605.22812}, 
+}
+```
