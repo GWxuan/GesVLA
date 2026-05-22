@@ -94,7 +94,7 @@ Real-world rollouts with a 7-DoF manipulator and three-camera observations (glob
 Grasp a specified block from clutter and place it on the designated plate.
 
 <p align="center">
-  <img src="assets/demo_block.gif" width="85%" alt="Pick-and-Place Block demo">
+  <img src="assets/demo_block.gif" width="65%" alt="Pick-and-Place Block demo">
 </p>
 
 ### Select Jelly
@@ -102,7 +102,7 @@ Grasp a specified block from clutter and place it on the designated plate.
 Pick specified jelly cups in pointing order and place them into a target plate.
 
 <p align="center">
-  <img src="assets/demo_jelly.gif" width="85%" alt="Select Jelly demo">
+  <img src="assets/demo_jelly.gif" width="65%" alt="Select Jelly demo">
 </p>
 
 ### Select Fruit and Vegetable
@@ -110,7 +110,7 @@ Pick specified jelly cups in pointing order and place them into a target plate.
 Pick specified bell peppers and bananas in pointing order and place them into a basket.
 
 <p align="center">
-  <img src="assets/demo_produce.gif" width="85%" alt="Select Fruit and Vegetable demo">
+  <img src="assets/demo_produce.gif" width="65%" alt="Select Fruit and Vegetable demo">
 </p>
 
 ## 🙏 Acknowledgements
